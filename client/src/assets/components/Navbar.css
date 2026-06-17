@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 /* General Navbar Styles */
 .navbar {
+  font-family: 'Inter', sans-serif;
   --nav-height: 68px;
   position: fixed;
   top: 18px;
@@ -396,13 +399,13 @@ body {
 
   .mobile-login {
     background: none;
-    border: 2px solid #ff7f50;
-    color: #ff7f50;
+    border: 2px solid #ff6b00;
+    color: #ff6b00;
     font-weight: bold;
   }
 
   .mobile-signup {
-    background: linear-gradient(45deg, #ff7f50, #6b5bff);
+    background: linear-gradient(45deg, #ff6b00, #6b5bff);
     color: white;
     font-weight: bold;
     border: none;
@@ -578,9 +581,8 @@ body {
 }
 
 /* LOGIN - Gradient Background with White Text */
-/* LOGIN - Gradient Background with White Text */
 .sign-up {
-  background: linear-gradient(45deg, #ff7f50, #6b5bff);
+  background: linear-gradient(45deg, #ff6b00, #6b5bff);
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -597,7 +599,7 @@ body {
   inset: 0;
   border-radius: 8px;
   padding: 2px;
-  background: linear-gradient(45deg, #ff7f50, #6b5bff);
+  background: linear-gradient(45deg, #ff6b00, #6b5bff);
   -webkit-mask: linear-gradient(white, white) content-box, linear-gradient(white, white);
   mask: linear-gradient(white, white) content-box, linear-gradient(white, white);
   mask-composite: exclude;
@@ -606,15 +608,14 @@ body {
   opacity: 0;
 }
 
-
 /* SIGN-UP - Gradient Text with Border */
 .login {
   background: none;
-  border: 2px solid #ff7f50;
+  border: 2px solid #ff6b00;
   padding: 8px 18px;
   border-radius: 8px;
   font-weight: bold;
-  background: linear-gradient(45deg, #ff7f50, #6b5bff);
+  background: linear-gradient(45deg, #ff6b00, #6b5bff);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -622,7 +623,7 @@ body {
 }
 
 .login:hover {
-  background: linear-gradient(45deg, #6b5bff, #ff7f50);
+  background: linear-gradient(45deg, #6b5bff, #ff6b00);
   color: white;
   -webkit-background-clip: unset;
   background-clip: unset;

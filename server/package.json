@@ -5,20 +5,31 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon dev.js"
+    "start": "nodemon dev.js",
+    "chroma": "C:\\Users\\tanus\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\chroma.exe run --path ../chroma"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@chroma-core/default-embed": "^0.1.9",
+    "@google/genai": "^2.8.0",
+    "bcryptjs": "^3.0.3",
+    "chromadb": "^3.4.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.5.2",
     "fuse.js": "^7.0.0",
+    "google-auth-library": "^10.7.0",
+    "helmet": "^8.2.0",
+    "jsonwebtoken": "^9.0.3",
+    "marked": "^18.0.5",
     "mongoose": "^8.12.2",
     "nodemailer": "^6.10.1",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "sqlite3": "^6.0.1"
   }
 }

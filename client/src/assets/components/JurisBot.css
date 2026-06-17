@@ -1,172 +1,542 @@
-/* Base styles */
-.Body {
-    font-family: 'Arial', sans-serif;
-    background-image: url('/botBack.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: #121212;
-    margin: 0;
-    padding: 0;
-    color: white;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Prevent body scrolling when chatbot is active (modern browsers) */
+body:has(.juris-layout) {
+    overflow: hidden;
 }
 
-/* Main container */
-.container {
-    width: 760px;
-    height: 1162px;
-    background-color: #f41f1f;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-    position: relative;
+.juris-layout {
+    font-family: 'Inter', sans-serif;
+    background-color: transparent; 
+    height: calc(100dvh - 80px); /* Strict height, account for navbar */
+    overflow: hidden; 
+    display: flex;
+    flex-direction: row;
+    color: #e2e8f0;
+}
+
+/* =========================================
+   SIDEBAR (ChatGPT Style)
+========================================= */
+.juris-sidebar {
+    width: 300px;
+    background: rgba(11, 12, 16, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
-    background-image: url('/botBack.jpg');
-    background-size: cover;
-    background-position: center;
+    transition: transform 0.3s ease, width 0.3s ease;
+    flex-shrink: 0;
+    z-index: 50;
 }
 
-/* Chat window (Messages will scroll) */
-.chat-window {
-    flex-grow: 1;
-    height: calc(100% - 80px);
-    /* Leaves space for input */
-    overflow-y: auto;
+.juris-sidebar.closed {
+    width: 0;
+    transform: translateX(-100%);
+    overflow: hidden;
+    border-right: none;
+}
+
+.sidebar-header {
     padding: 20px;
     display: flex;
-    flex-direction: column;
-    scroll-behavior: auto;
-    overflow-anchor: auto;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.scroll-anchor {
-    overflow-anchor: none;
-}
-
-/* Auto-scroll to new messages */
-.chat-window::-webkit-scrollbar {
-    width: 4px;
-    /* Reduced width */
-}
-
-.chat-window::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.chat-window::-webkit-scrollbar-thumb {
-    background: rgba(200, 200, 200, 0.3);
-    border-radius: 5px;
-    transition: background 0.3s ease-in-out;
-}
-
-.chat-window::-webkit-scrollbar-thumb:hover {
-    background: rgba(200, 200, 200, 0.6);
-}
-
-/* Chat messages */
-.message {
-    margin-bottom: 15px;
-}
-
-.user-message {
-    text-align: right;
-    font-size: larger;
-    margin-right: 60px;
-}
-
-.bot-message {
-    text-align: left;
-    margin-left: 60px;
-}
-
-.message-content {
-    display: inline-block;
+.new-chat-btn {
+    flex-grow: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
     padding: 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    line-height: 1.5;
-    word-wrap: break-word;
-}
-
-/* User message */
-.user-message .message-content {
-    background-image: linear-gradient(45deg, #6D33A6, #A63F9F);
-    color: white;
-    font-size: larger;
-}
-
-/* Bot message */
-.bot-message .message-content {
-    background-image: linear-gradient(45deg, #4429A6, #a18cd1);
-    color: white;
-    font-size: larger;
-}
-
-/* Fixed Input Box */
-.chat-input-container {
-    position: fixed;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    padding: 10px;
-    background-color: #333232;
-    border-radius: 20px;
+    gap: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.new-chat-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.close-sidebar-mobile {
+    display: none;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.sidebar-chat-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px 20px;
+}
+
+.sidebar-chat-list::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar-chat-list::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.history-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    padding-left: 4px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: background 0.2s, color 0.2s;
+    margin-bottom: 4px;
+    group: chat-item;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+}
+
+.history-item.active {
+    background: rgba(107, 91, 255, 0.15);
+    color: #ffffff;
+}
+
+.chat-title {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.9rem;
+}
+
+.delete-chat {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+}
+
+.history-item:hover .delete-chat {
+    opacity: 1;
+}
+.delete-chat:hover {
+    color: #ef4444;
+}
+
+/* =========================================
+   MAIN CHAT CONTAINER
+========================================= */
+.juris-chat-container {
+    flex-grow: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-width: 0; /* Prevents flex blowout */
+}
+
+.mobile-chat-header {
+    display: none;
+    padding: 16px 20px;
+    background: rgba(11, 12, 16, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    align-items: center;
+    gap: 16px;
+    z-index: 10;
+}
+
+.hamburger-btn {
+    background: transparent;
+    border: none;
+    color: #e2e8f0;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.mobile-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #e2e8f0;
+}
+
+/* Empty State / Welcome Screen */
+.juris-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10vh 20px;
+    height: 100%;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.juris-logo-glow {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(107,91,255,0.4) 0%, rgba(107,91,255,0) 70%);
+    margin-bottom: -50px;
+}
+
+.juris-brand {
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #ff6b00 0%, #6b5bff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.juris-subtitle {
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: #94a3b8;
+    margin-top: 10px;
+}
+
+/* Messages Area */
+.juris-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-bottom: 180px; 
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+}
+
+.juris-messages::-webkit-scrollbar { width: 6px; }
+.juris-messages::-webkit-scrollbar-track { background: transparent; }
+.juris-messages::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.juris-message-row {
+    display: flex;
+    justify-content: center;
+    padding: 28px 20px;
+    width: 100%;
+}
+
+.juris-message-inner {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    gap: 20px;
+}
+
+.row-user { background-color: transparent; }
+.row-bot { background-color: transparent; }
+
+/* Avatars */
+.juris-avatar {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
     justify-content: center;
 }
 
-/* Input field */
-.chat-input {
+.avatar-user {
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-bot {
+    background: transparent;
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Message Body & Markdown */
+.juris-message-body {
     flex-grow: 1;
-    padding: 12px;
-    border-radius: 25px;
+    max-width: 100%;
+    min-width: 0;
+    line-height: 1.7;
+    font-size: 1.05rem;
+    color: #f8fafc;
+    letter-spacing: 0.2px;
+}
+
+.row-user .juris-message-body {
+    font-size: 1.1rem;
+    color: #f1f5f9;
+}
+
+.juris-content p { margin: 0 0 18px 0; }
+.juris-content p:last-child { margin-bottom: 0; }
+.juris-content strong { color: #ffffff; font-weight: 600; }
+.juris-content ul, .juris-content ol { margin: 0 0 18px 0; padding-left: 24px; }
+.juris-content li { margin-bottom: 8px; }
+
+/* Searching Sources Animation */
+.searching-animation-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(107, 91, 255, 0.1);
+    border: 1px solid rgba(107, 91, 255, 0.2);
+    padding: 12px 20px;
+    border-radius: 12px;
+    width: fit-content;
+    box-shadow: 0 4px 20px rgba(107, 91, 255, 0.1);
+}
+
+.search-spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 107, 0, 0.3);
+    border-top-color: #ff6b00;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.search-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #a78bfa;
+    background: linear-gradient(90deg, #ff6b00, #a78bfa, #ff6b00);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes shine { to { background-position: 200% center; } }
+
+/* Sources Section */
+.juris-sources-container {
+    margin-top: 24px;
+    padding-top: 16px;
+}
+
+.sources-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.sources-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.source-chip {
+    background: rgba(107, 91, 255, 0.1);
+    border: 1px solid rgba(107, 91, 255, 0.2);
+    border-radius: 20px;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, background 0.2s;
+    cursor: default;
+}
+
+.source-chip:hover {
+    background: rgba(107, 91, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.source-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #a78bfa;
+}
+
+.source-law {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #e2e8f0;
+}
+
+/* Input Area Fixed at Bottom */
+.juris-input-area {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, rgba(11, 12, 16, 0) 0%, rgba(11, 12, 16, 0.95) 40%, rgba(11, 12, 16, 1) 100%);
+    padding: 40px 20px 20px 20px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none; 
+}
+
+.juris-input-inner {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto; 
+}
+
+.juris-input-box {
+    width: 100%;
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-end;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.juris-input-box:focus-within {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(107, 91, 255, 0.5);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(107, 91, 255, 0.15);
+}
+
+.juris-textarea {
+    flex-grow: 1;
+    background: transparent;
     border: none;
     outline: none;
-    font-size: 14px;
-    background-color: #2c2c2c;
-    color: white;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    padding: 8px 4px;
+    resize: none;
+    max-height: 200px;
+    min-height: 26px;
+    line-height: 1.5;
 }
 
-/* Placeholder text in white */
-.chat-input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
+.juris-textarea::placeholder {
+    color: #64748b;
 }
 
-/* Send button */
-.send-button {
-    margin-left: 10px;
-    padding: 12px 18px;
-    border-radius: 25px;
+.juris-send-btn {
+    background: transparent;
+    color: #64748b;
     border: none;
-    background-image: linear-gradient(to left, #4287f5, #9c27b0, #f44336);
-    color: white;
-    font-size: 14px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 10px;
+    margin-bottom: 2px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.juris-send-btn.active {
+    background: linear-gradient(135deg, #ff6b00 0%, #6b5bff 100%);
+    color: #ffffff;
     cursor: pointer;
+    box-shadow: 0 4px 15px rgba(107, 91, 255, 0.3);
 }
 
-.send-button:hover {
-    opacity: 0.8;
+.juris-send-btn.active:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(107, 91, 255, 0.5);
 }
 
-/* Centered "Hello" Text */
-.hello-container {
+.juris-disclaimer {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 14px;
     text-align: center;
 }
 
-.hello h1 {
-    font-size: 50px;
-    font-weight: bold;
-    background: linear-gradient(to right, #4287f5, #9c27b0, #f44336);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    margin: 0;
-    padding: 0;
+/* =========================================
+   ANIMATIONS
+========================================= */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.juris-icon-pulse { margin-bottom: 20px; animation: slowPulse 3s infinite alternate ease-in-out; }
+@keyframes slowPulse { 0% { transform: scale(0.95); opacity: 0.8; filter: drop-shadow(0 0 10px rgba(107, 91, 255, 0.2)); } 100% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 25px rgba(107, 91, 255, 0.6)); } }
+.message-pop-in { animation: messagePop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes messagePop { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.scale-in { animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+.fade-in-up { opacity: 0; animation: fadeInUp 0.5s ease-out 0.1s forwards; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.delay-fade { opacity: 0; animation: fadeIn 0.5s ease-out 0.3s forwards; }
+.input-slide-up { animation: slideUpInput 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes slideUpInput { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+
+.juris-suggestions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 40px; max-width: 600px; }
+.suggestion-chip { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; padding: 12px 20px; border-radius: 20px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease; font-family: 'Inter', sans-serif; }
+.suggestion-chip:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(107, 91, 255, 0.4); color: #ffffff; transform: translateY(-2px); }
+.stagger-in .suggestion-chip:nth-child(1) { animation: fadeInUp 0.5s ease-out 0.2s forwards; opacity: 0; }
+.stagger-in .suggestion-chip:nth-child(2) { animation: fadeInUp 0.5s ease-out 0.3s forwards; opacity: 0; }
+.stagger-in .suggestion-chip:nth-child(3) { animation: fadeInUp 0.5s ease-out 0.4s forwards; opacity: 0; }
+
+/* Markdown specific styles */
+.markdown-body pre { background: rgba(18, 18, 24, 0.8) !important; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 16px; overflow-x: auto; margin: 16px 0; }
+.markdown-body code { font-family: monospace; background: rgba(255, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+.markdown-body pre code { background: transparent; padding: 0; }
+.markdown-body h1, .markdown-body h2, .markdown-body h3 { margin-top: 24px; margin-bottom: 12px; font-weight: 600; }
+
+/* Responsive Sidebar */
+@media (max-width: 900px) {
+    .juris-sidebar {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        height: 100%;
+        box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+    }
+    .mobile-chat-header {
+        display: flex;
+    }
+    .close-sidebar-mobile {
+        display: block;
+    }
 }

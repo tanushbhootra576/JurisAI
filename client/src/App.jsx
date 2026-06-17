@@ -12,14 +12,12 @@ import Contact from "./assets/components/Contact";
 import Navbar from "./assets/components/Navbar";
 import JurisBot from "./assets/components/JurisBot";
 import AboutFooter from "./assets/components/Footer";
-import VerifyEmail from "./assets/components/VerifyEmail";
 import Profile from "./assets/components/Profile";
 
 function App() {
   const location = useLocation();
   const user = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
   const isLoggedIn = !!user;
-  const isVerified = !!user?.verified;
 
   const hiddenNavbarRoutes = ["/login", "/register"];
   const hiddenFooterRoutes = ["/login", "/register", "/JurisBot"];
@@ -42,14 +40,13 @@ function App() {
           <Route path="/business" element={<Business />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/verify" element={<VerifyEmail />} />
           <Route path="/profile" element={<Profile />} />
 
           {/* Protected Route for JurisBot */}
           <Route
             path="/JurisBot"
             element={
-              isLoggedIn ? (isVerified ? <JurisBot /> : <Navigate to="/verify" />) : <Navigate to="/login" />
+              isLoggedIn ? <JurisBot /> : <Navigate to="/login" />
             }
           />
         </Routes>

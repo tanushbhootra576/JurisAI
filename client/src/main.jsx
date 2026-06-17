@@ -9,10 +9,14 @@ import axios from 'axios';
 if (import.meta.env.DEV) {
   axios.defaults.baseURL = 'http://localhost:5000';
 }
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 const root = document.getElementById("root");
 
 ReactDOM.createRoot(root).render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID"}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </GoogleOAuthProvider>
 );

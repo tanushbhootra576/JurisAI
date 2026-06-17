@@ -96,9 +96,11 @@ const VerifyEmail = () => {
           </button>
           {sendMsg && <div className="msg success" role="status">{`Check your Inbox or Spam folder for the Verification code `}</div>}
           {sendError && <div className="msg error" role="alert">{sendError}</div>}
-          {/* {devCode && (
-            <div className="dev-hint">{console.log(devCode)}</div>
-          )} */}
+          {devCode && (
+            <div className="msg info dev-hint" style={{ marginTop: '1rem', color: '#0056b3', backgroundColor: '#cce5ff', padding: '10px', borderRadius: '4px', textAlign: 'center' }}>
+              <strong>For testing purpose:</strong> Your verification code is <span style={{ fontSize: '1.2em', letterSpacing: '2px' }}>{devCode}</span>
+            </div>
+          )}
         </form>
 
         <form className="verify-form" onSubmit={handleVerify}>

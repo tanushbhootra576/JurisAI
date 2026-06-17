@@ -1,19 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
 import "./Login.css";  // Import the CSS file for styling
 import { avatarUrls, getAvatarUrlByName } from '../icons/avatars';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await axios.post("/api/login", { email, password });
+      const res = await axios.post("/api/google", { token: credentialResponse.credential });
 
       if (res.data.message === "Successful") {
         // Store user data in localStorage (map avatar name/index to local URL)
@@ -26,91 +23,32 @@ const Login = () => {
 
         const user = { ...serverUser, avatar: avatarUrl, avatarName: serverUser.avatar };
         localStorage.setItem("user", JSON.stringify(user));
-        // If not verified, go to verify page first
-        if (!user.verified) {
-          navigate("/verify");
-        } else {
-          navigate("/JurisBot");
+        if (res.data.token) {
+          localStorage.setItem("token", res.data.token);
         }
+        navigate("/JurisBot");
       } else {
-        alert(`Login failed: ${res.data.message}`);  // Display the correct error message
+        alert(`Login failed: ${res.data.message}`);
       }
     } catch (error) {
-      console.error("Login error:", error);
-      alert("An error occurred during login.");
+      console.error("Google Login error:", error);
+      alert("An error occurred during Google login.");
     }
   };
 
   return (
     <div className="login-container">
-      <form className="login-form" onSubmit={handleLogin}>
-        <h2 className="PAR">Login</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="input-field"
-          autoComplete="email"
-        />
-        <div className="password-wrapper">
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="password-input"
-            autoComplete="current-password"
+      <div className="login-form">
+        <h2 className="PAR">Login with Google</h2>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem', marginBottom: '2rem' }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => {
+              alert("Google login failed");
+            }}
           />
-          <button
-            type="button"
-            className="toggle-password"
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            onClick={() => setShowPassword((v) => !v)}
-          >
-            {showPassword ? (
-              // Eye-off icon
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-5 0-9.27-3.11-11-8 1.02-2.89 2.99-5.1 5.32-6.41" />
-                <path d="M1 1l22 22" />
-                <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.11 11 8-.64 1.8-1.64 3.36-2.9 4.6" />
-                <path d="M14.12 14.12A3 3 0 0 1 9.88 9.88" />
-              </svg>
-            ) : (
-              // Eye icon
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            )}
-          </button>
         </div>
-        <button type="submit" className="submit-btn">Login</button>
-      </form>
+      </div>
     </div>
   );
 };

@@ -3,144 +3,57 @@ import User from '../models/ourmap.js';
 import { generateVerificationCode } from '../utils/verification.js';
 import mailer, { sendWelcomeEmail, sendVerificationCodeEmail } from '../utils/mailer.js';
 import contactAckTemplate from '../utils/templates/contactAck.js';
+import { generateToken, protect } from '../utils/auth.js';
+import { OAuth2Client } from 'google-auth-library';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const router = express.Router();
 
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+// Google OAuth login/register
+router.post('/google', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ error: 'Google token is required' });
 
   try {
-    console.log(`Login attempt for email: ${email}`);
-    const user = await User.findOne({ email });
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID, 
+    });
+    const payload = ticket.getPayload();
+    const { email, name, picture } = payload;
 
-    if (user) {
-      if (user.password === password) {
-        // Return message and user data as an object (include avatar fields)
-        res.json({
-          message: "Successful",
-          user: {
-            name: user.name,
-            email: user.email,
-            verified: Boolean(user.verified),
-            avatar: user.avatar || null, // stored as filename on server
-            avatarIndex: typeof user.avatarIndex === 'number' ? user.avatarIndex : null
-          }
-        });
-      } else {
-        res.status(401).json({ message: "Incorrect password" });
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Register new user
+      user = await User.create({
+        name,
+        email,
+        verified: true, // Google emails are already verified
+        avatar: picture
+      });
+      // Optionally send welcome email
+      // await sendWelcomeEmail({ to: email, name });
+    }
+
+    // Generate our own JWT
+    const jwtToken = generateToken(user._id);
+
+    res.json({
+      message: "Successful",
+      token: jwtToken,
+      user: {
+        name: user.name,
+        email: user.email,
+        verified: Boolean(user.verified),
+        avatar: user.avatar || null,
+        avatarIndex: typeof user.avatarIndex === 'number' ? user.avatarIndex : null
       }
-    } else {
-      res.status(404).json({ message: "No user exists" });
-    }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
-  try {
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Name, email, and password are required.' });
-    }
-
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ error: 'User already exists with this email.' });
-    }
-
-    const user = await User.create({ name, email, password });
-    // Keep status 200 to match current frontend expectation
-    return res.status(200).json({
-      message: 'Signup successful',
-      user: { name: user.name, email: user.email, avatar: user.avatar || null, avatarIndex: user.avatarIndex || null }
     });
   } catch (err) {
-    return res.status(400).json({ error: err.message });
-  }
-});
-
-// NOTE: This legacy endpoint has been replaced by /verification/send and /verification/confirm
-// Keeping it for backwards compatibility but it has confusing logic - use the new endpoints instead
-router.post('/verification', async (req, res) => {
-  try {
-    const { email, verificationToken } = req.body;
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required.' });
-    }
-    
-    // If no token provided, generate and return code (for testing/dev only)
-    if (!verificationToken) {
-      const code = generateVerificationCode();
-      console.log(`Generating verification code ${code} for ${email}`);
-      await User.updateOne({ email }, { verificationToken: code, verified: false });
-      return res.status(200).json({ message: 'Verification code generated', email, code });
-    }
-    
-    // If token provided, verify it
-    const user = await User.findOne({ email });
-    if (!user || !user.verificationToken) {
-      return res.status(400).json({ error: 'No verification code found. Please request a new code.' });
-    }
-    
-    if (String(user.verificationToken) !== String(verificationToken)) {
-      return res.status(400).json({ error: 'Invalid verification code.' });
-    }
-    
-    await User.updateOne({ email }, { verified: true, verificationToken: undefined });
-    return res.status(200).json({ message: 'Email verified successfully.' });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// Send verification code email (separate from verification check)
-router.post('/verification/send', async (req, res) => {
-  try {
-    const { email, name } = req.body || {};
-    if (!email) return res.status(400).json({ error: 'Email is required.' });
-
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ error: 'No user exists with this email.' });
-
-    const code = generateVerificationCode();
-    // Persist the code on user document (no expiry field yet)
-    await User.updateOne({ email }, { verificationToken: code, verified: false });
-
-    await sendVerificationCodeEmail({ to: email, name: name || user.name || 'there', code });
-
-    const payload = { message: 'Verification code email sent' };
-    if (process.env.NODE_ENV !== 'production') payload.code = code; // helpful for dev/testing
-    return res.status(200).json(payload);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// Confirm verification code
-router.post('/verification/confirm', async (req, res) => {
-  try {
-    const { email, code } = req.body || {};
-    if (!email || !code) return res.status(400).json({ error: 'Email and code are required.' });
-
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ error: 'No user exists with this email.' });
-
-    if (!user.verificationToken) {
-      return res.status(400).json({ error: 'No verification code found. Please request a new code.' });
-    }
-
-    if (String(user.verificationToken) !== String(code)) {
-      return res.status(400).json({ error: 'Invalid verification code.' });
-    }
-
-    user.verified = true;
-    user.verificationToken = undefined;
-    await user.save();
-
-    return res.status(200).json({ message: 'Email verified successfully.' });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.error('Google Auth Error:', err);
+    res.status(401).json({ error: 'Invalid Google token' });
   }
 });
 
@@ -191,25 +104,13 @@ router.post('/contact', async (req, res) => {
   }
 });
 
-// router.post('/verification',async(req, res)=>{
-//    const { email } = req.body;
-
-//    if (!email) {
-//        return res.status(400).json({ error: 'Email is required.' });
-//    }
-
-//    const verificationCode = generateVerificationCode();
-//    console.log(`Sending verification code ${verificationCode} to ${email}`);
-
-//    return res.status(200).json({ message: 'Verification email sent successfully.' });
-// });
 
 // Update user profile (name/avatar)
-// Accepts { email, name, avatar, avatarIndex }
-router.patch('/user', async (req, res) => {
+// Accepts { name, avatar, avatarIndex }
+router.patch('/user', protect, async (req, res) => {
   try {
-    const { email, name, avatar, avatarIndex } = req.body || {};
-    if (!email) return res.status(400).json({ error: 'Email is required to update profile.' });
+    const { name, avatar, avatarIndex } = req.body || {};
+    const email = req.user.email; // Extracted securely from token
 
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: 'No user found with this email.' });

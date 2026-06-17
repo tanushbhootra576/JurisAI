@@ -15,9 +15,10 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    navigate("/");
+    localStorage.removeItem("token");
     setProfileOpen(false);
     setMenuOpen(false);
+    navigate("/");
   };
 
   const handleChatBotClick = (e) => {

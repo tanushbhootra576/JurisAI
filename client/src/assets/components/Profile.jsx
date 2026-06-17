@@ -48,10 +48,14 @@ const Profile = () => {
         // If we have an email, attempt to persist to server
         const email = user && user.email;
         if (email) {
+            const token = localStorage.getItem("token");
             fetch('/api/user', {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, name, avatar: avatarName, avatarIndex })
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({ name, avatar: avatarName, avatarIndex })
             })
                 .then((res) => res.json().then(j => ({ status: res.status, body: j })))
                 .then(({ status, body }) => {

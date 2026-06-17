@@ -3,68 +3,92 @@ import "./About1.css";
 
 const About1 = () => {
   return (
-    <section className="about-section">
-      <div className="containerr">
-        <h1 className="about-title"><span>Juris AI</span> Your Virtual Cyber Lawyer</h1>
-        <p className="about-desc">
-          Juris AI is an advanced AI-powered legal chatbot specializing in cyber law. Whether you're dealing with
-          online fraud, hacking, identity theft, or cyberbullying, Juris AI helps you understand applicable laws
-          and suggest s possible legal actions.
-        </p>
-
-        <div className="features1">
-          <h2>Why Choose Juris AI?</h2>
-          <ul>
-            <li><strong>Legal Awareness:</strong> Get instant insights on cyber laws.</li>
-            <li><strong>Cybersecurity Protection:</strong> Learn how to legally protect yourself from cyber threats.</li>
-            <li><strong>Quick & Reliable:</strong> Get legal guidance 24/7.</li>
-            <li><strong>AI-Powered Precision:</strong> NLP-based chatbot for accurate legal assistance.</li>
-            <li><strong>Easy-to-Use Interface:</strong> A simple, interactive chatbot designed for all users.</li>
-            <li><strong>Location-Based Assistance:</strong> Find nearby cybercrime helplines and legal authorities.</li>
-          </ul>
+    <div className="about-modern-layout">
+      {/* Hero Section */}
+      <section className="about-hero-section">
+        <div className="about-hero-content">
+          <h1 className="bento-title">
+            Your Intelligent <br />
+            <span className="gradient-text-alt">Legal Companion</span>
+          </h1>
+          <p className="bento-subtitle">
+            JurisAI represents a paradigm shift in legal tech. We empower individuals and businesses with instant, accurate insights into Indian law, transforming complex legal jargon into actionable clarity.
+          </p>
         </div>
-
-        <div className="features1">
-          <h2>Key Features</h2>
-          <ul>
-            <li><strong>Cyber Law Guidance:</strong> Learn about laws and penalties for cyber offenses.</li>
-            <li><strong>Automated Legal Assistance:</strong> Step-by-step guidance on filing complaints.</li>
-            <li><strong>Case-Specific Suggestions:</strong> Get relevant laws based on your query.</li>
-            <li><strong>Police & Helpline Directory:</strong> Find cybercrime helplines and legal authorities.</li>
-            <li><strong>24/7 Availability:</strong> Access instant legal help anytime.</li>
-            <li><strong>Legal Documentation Support:</strong> Learn how to prepare necessary legal documents.</li>
-          </ul>
+        <div className="about-hero-graphic">
+          <div className="glowing-orb"></div>
+          <div className="glass-panel">
+            <div className="glass-panel-header">JurisAI Analysis</div>
+            <div className="glass-line"></div>
+            <div className="glass-line short"></div>
+            <div className="glass-line medium"></div>
+          </div>
         </div>
+      </section>
 
-        <div className="how-it-works1">
-          <h2>How Does Juris AI Work?</h2>
-          <ol>
-            <li><strong>User Input:</strong> Describe your cyber-related issue.</li>
-            <li><strong>AI Processing:</strong> Juris AI analyzes your case and finds relevant laws.</li>
-            <li><strong>Legal Suggestions:</strong> Get applicable laws, penalties, and actions.</li>
-            <li><strong>Next Steps:</strong> Learn how to file complaints or contact authorities.</li>
-            <li><strong>Case Study & References:</strong> Get example cases and past legal references.</li>
-            <li><strong>Multilingual Support:</strong> Available in multiple languages for better accessibility.</li>
-          </ol>
+      {/* Bento Box Features */}
+      <section className="bento-grid-section">
+        <div className="bento-header">
+          <h2>Capabilities Engineered for Precision</h2>
         </div>
+        
+        <div className="bento-grid">
+          {/* Large Card */}
+          <div className="bento-card span-2 highlight-card">
+            <div className="bento-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <h3>Comprehensive Legal Intelligence</h3>
+            <p>Our NLP engine is trained extensively on the Indian Penal Code, IT Acts, and corporate compliance frameworks to deliver enterprise-grade accuracy 24/7.</p>
+          </div>
 
-        <div className="additional-info1">
-          <h2>Who Can Benefit from Juris AI?</h2>
-          <p>Juris AI is designed for a wide range of users, including:</p>
-          <ul>
-            <li><strong>Individuals:</strong> Victims of cybercrime seeking legal awareness.</li>
-            <li><strong>Businesses:</strong> Companies needing cybersecurity compliance support.</li>
-            <li><strong>Law Students:</strong> Those studying cyber law and digital rights.</li>
-            <li><strong>Law Enforcement:</strong> Officials looking for quick legal references.</li>
-          </ul>
+          {/* Normal Cards */}
+          <div className="bento-card">
+            <h3>Automated Case Analysis</h3>
+            <p>Upload details or describe your issue, and JurisAI automatically correlates it with relevant past judgments and sections.</p>
+          </div>
+
+          <div className="bento-card">
+            <h3>Actionable Next Steps</h3>
+            <p>We don't just provide laws. We give you a step-by-step roadmap on filing complaints, serving notices, or contacting authorities.</p>
+          </div>
+
+          {/* Wide Card */}
+          <div className="bento-card span-2">
+            <h3>Location-Aware Network</h3>
+            <p>Instantly find nearby cybercrime cells, police stations, and certified legal authorities with dynamically generated directories tailored to your jurisdiction.</p>
+          </div>
+
+          <div className="bento-card dark-card">
+            <h3>Document Drafting</h3>
+            <p>Generate standard NDAs, legal notices, and compliance reports in seconds.</p>
+          </div>
         </div>
+      </section>
 
-
-      </div>
-    </section>
+      {/* Split Section */}
+      <section className="split-section">
+        <div className="split-left">
+          <h2>Who Powers Their Decisions With JurisAI?</h2>
+          <p>Designed for scale and accessibility, our architecture serves a diverse ecosystem of users.</p>
+        </div>
+        <div className="split-right">
+          <div className="user-persona">
+            <h4>01. Individuals</h4>
+            <p>Victims of cybercrime or fraud seeking immediate legal awareness without high consultancy fees.</p>
+          </div>
+          <div className="user-persona">
+            <h4>02. Enterprises</h4>
+            <p>Startups and corporations automating compliance checks and contract auditing.</p>
+          </div>
+          <div className="user-persona">
+            <h4>03. Legal Professionals</h4>
+            <p>Lawyers and law enforcement accelerating their precedent research and case preparation.</p>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
-
 export default About1;
-
